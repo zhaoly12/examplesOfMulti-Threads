@@ -17,7 +17,10 @@ from concurrent.futures import ThreadPoolExecutor
 import os
 
 class Server():
-    
+    '''
+    if there are N clients connected with the server, there must be N threads.
+    every client socket should have its own thread
+    '''    
     def __init__(self, *args, cpuCount = os.cpu_count()):
         self.ip = args[0]
         self.port = args[1]
@@ -52,7 +55,11 @@ class Server():
         #self.server.close()
             
 class Client():
-    
+    '''
+    for a client there should be two threads
+    one for reading message from the server
+    the other for sending message to the server
+    '''
     def __init__(self, *args):
         self.ip = args[0]
         self.port = args[1]
