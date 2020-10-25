@@ -26,10 +26,30 @@ class Gobang():
         self.cond = threading.Condition()
         self.flag = 0
         
-    def __win(self):
-        '''
-        to do
-        '''
+    def __win(self, value):
+        for i in range(self.size):
+            try:
+                start = self.positions[i].index(value)
+            except:
+                break
+            j = start
+            while j <= self.size-5:
+                count = 0
+                for s in range(j, self.size-4):
+                    if self.positions[i][s] == value:
+                        j = s
+                        count += 1
+                        break
+                if count == 0:
+                    break
+                for e in range(j+1, j+5):
+                    if self.positions[i][e] != value:
+                        j = e
+                        break
+                    else:
+                        count += 1
+                if count == 5:
+                    return True
         return False
     
     def __full(self):
@@ -44,11 +64,9 @@ class Gobang():
         print('______________________________________')
     
     def __white(self):
-        if self.__win():
-            return
-        elif self.__full():
+        if self.__full():
             print('draw')
-            return
+            return True
         self.cond.acquire()
         while self.flag != 0:
             #print('waiting for black')
@@ -63,13 +81,15 @@ class Gobang():
         self.flag = 1
         self.cond.notify_all()
         self.cond.release()
+        if self.__win(0):
+            print('white won!')
+            return True
+        return False
         
     def __black(self):
-        if self.__win():
-            return
-        elif self.__full():
+        if self.__full():
             print('draw')
-            return
+            return True
         self.cond.acquire()
         while self.flag != 1:
             #print('waiting for white')
@@ -84,7 +104,20 @@ class Gobang():
         self.flag = 0
         self.cond.notify_all()
         self.cond.release()
-            
+        if self.__win(-1):
+            print('black won!')
+            return True
+        return False
+
+# in sequence
+go = Gobang()
+while True:
+    if go._Gobang__white():
+        break
+    if go._Gobang__black():
+        break
+
+# multi-threads mode
 go = Gobang()
 for i in range(50):             
     threading.Thread(target = go._Gobang__black).start()
